@@ -1,0 +1,35 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/db_name
+
+  db:
+    image: postgres:13-bullseye
+    restart: always
+    environment:
+      POSTGRES_USER: matt
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: testDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: mrguerrilla@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: changeme
+    ports:
+      - "8180:80"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
