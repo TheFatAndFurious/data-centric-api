@@ -13,7 +13,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: matt
-      POSTGRES_PASSWORD: test
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: testDb
     ports:
       - "5432:5432"
