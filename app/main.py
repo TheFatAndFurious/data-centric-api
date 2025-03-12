@@ -1,4 +1,6 @@
 from contextlib import asynccontextmanager
+from http.client import HTTPException
+from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.params import Depends
@@ -7,6 +9,7 @@ from sqlmodel import Session
 from app.crud import create_exercice, get_exercices, get_single_exercice, update_exercice
 from app.db import init_db, get_session
 from app.models import Exercice
+from app.schemas import ExerciceUpdate
 
 app = FastAPI()
 
@@ -22,7 +25,7 @@ def create_exercice_endpoint(name: str, muscle: str, session: Session = Depends(
 
 
 @app.get("/exercices/", response_model=list[Exercice])
-def get_all_exercices(muscle:str, session: Session = Depends(get_session)):
+def get_all_exercices(muscle:Optional[str] = None, session: Session = Depends(get_session)):
      return get_exercices(session, muscle=muscle)
 
 @app.get("/exercices/{id}", response_model=Exercice)
@@ -37,6 +40,13 @@ def delete_exercice_by_id(id: int, session: Session = Depends(get_session)):
     return {"message": "Exercice deleted successfully"}
 
 @app.patch("/exercices/{id}")
-def update_exercice_by_id(id:int, name:str | None = None, muscle: str | None = None,  session: Session = Depends(get_session)):
-    return update_exercice(session, id, name=name, muscle=muscle)
-
+def update_exercice_by_id(
+        id:int,
+        exercice_update: ExerciceUpdate,
+        session: Session = Depends(get_session)):
+    try:
+        updated_data = exercice_update.model_dump(exclude_unset=True)
+        updated_exercice = update_exercice(session, id, updated_data)
+        return updated_exercice
+    except HTTPException:
+        raise

@@ -1,3 +1,6 @@
+from http.client import HTTPException
+from typing import Dict, Any
+
 from sqlmodel import Session, select
 
 from app.models import Exercice
@@ -23,16 +26,18 @@ def get_single_exercice(session: Session, id: int):
     return session.exec(statement).first()
 
 def delete_exercice(session: Session, id: int):
-    exercice = get_single_exercice(session, id)
+    exercice: Exercice = get_single_exercice(session, id)
+    if not exercice:
+        raise HTTPException(status_code=404, detail="Exercice not found")
     session.delete(exercice)
     session.commit()
 
-def update_exercice(session: Session, id: int, name: str | None = None, muscle: str | None = None):
+def update_exercice(session: Session, id: int, update_data: Dict[str, Any]) -> Exercice:
     exercice: Exercice = get_single_exercice(session, id)
-    if name:
-        exercice.name = name
-    if muscle:
-        exercice.muscle = muscle
+    if not exercice:
+        raise HTTPException(status_code=404, detail="Exercice not found")
+    for key, value in update_data.items():
+        setattr(exercice, key, value)
     session.add(exercice)
     session.commit()
     session.refresh(exercice)
