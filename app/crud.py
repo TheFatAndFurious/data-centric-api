@@ -21,3 +21,19 @@ def get_exercices(session: Session, skip: int = 0, limit: int = 100, muscle: str
 def get_single_exercice(session: Session, id: int):
     statement = select(Exercice).where(Exercice.id == id)
     return session.exec(statement).first()
+
+def delete_exercice(session: Session, id: int):
+    exercice = get_single_exercice(session, id)
+    session.delete(exercice)
+    session.commit()
+
+def update_exercice(session: Session, id: int, name: str | None = None, muscle: str | None = None):
+    exercice: Exercice = get_single_exercice(session, id)
+    if name:
+        exercice.name = name
+    if muscle:
+        exercice.muscle = muscle
+    session.add(exercice)
+    session.commit()
+    session.refresh(exercice)
+    return exercice
