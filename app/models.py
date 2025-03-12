@@ -1,15 +1,25 @@
-from sqlmodel import SQLModel, Field, Session
+from datetime import datetime
+from typing import Optional
+
+from sqlmodel import SQLModel, Field
 
 class Exercice(SQLModel, table=True):
-    id: int = Field(primary_key=True, index=True)
-    name: str = Field(unique=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True, nullable=False)
+    muscle: str = Field(unique=True, nullable=True)
 
-def create_exercice(session: Session, name: str) :
-    new_exercice = Exercice(name=name)
-    session.add(new_exercice)
-    session.commit()
-    session.refresh(new_exercice)
-    return new_exercice
+class Workout(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date: datetime = Field(nullable=False)
+    notes: Optional[str] = Field(default=None)
+
+class Set(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    session_id: int = Field(foreign_key="workout.id", nullable=False)
+    exercice_id: int = Field(foreign_key="exercice.id", nullable=False)
+    repetitions: int = Field(nullable=False)
+    weight: float = Field(nullable=False)
+
 
 
 
