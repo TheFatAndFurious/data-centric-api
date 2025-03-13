@@ -10,8 +10,19 @@ from app.crud import create_exercice, get_exercices, get_single_exercice, update
 from app.db import init_db, get_session
 from app.models import Exercice
 from app.schemas import ExerciceUpdate
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = ["http://localhost:5174"]
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

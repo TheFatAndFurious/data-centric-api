@@ -3,10 +3,15 @@ from typing import Optional
 
 from sqlmodel import SQLModel, Field
 
+class MuscleGroup(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True, nullable=False)
+    description: Optional[str] = Field(default=None)
+
 class Exercice(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True, nullable=False)
-    muscle: str = Field(unique=True, nullable=True)
+    muscle: int = Field(foreign_key="musclegroup.id", nullable=True)
 
 class Workout(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
